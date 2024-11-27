@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Previsão de Diabetes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 25px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px; 
+        }
+        h1 {
+            text-align: center;
+            color: #4c60af;
+            font-size: 1.8rem; 
+            margin-bottom: 25px; 
+        }
+        label {
+            font-size: 16px; 
+            color: #555;
+            margin-bottom: 10px; 
+            display: block;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        small {
+            font-size: 13px; 
+            color: #888;
+            display: block;
+            margin-top: 5px; 
+        }
+        button {
+            background-color: #4c60af;
+            color: white;
+            border: none;
+            padding: 14px 20px; 
+            border-radius: 4px;
+            font-size: 17px; 
+            width: 100%;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #3b4a86; 
+        }
+        #result {
+            font-size: 18px; 
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+            color: #333;
+        }
+    </style>
+    <script>
+        function sendData() {
+            const data = {
+                'Pregnancies': document.getElementById('Pregnancies').value,
+                'Glucose': document.getElementById('Glucose').value,
+                'BloodPressure': document.getElementById('BloodPressure').value,
+                'SkinThickness': document.getElementById('SkinThickness').value,
+                'Insulin': document.getElementById('Insulin').value,
+                'BMI': document.getElementById('BMI').value,
+                'DiabetesPedigreeFunction': document.getElementById('DiabetesPedigreeFunction').value,
+                'Age': document.getElementById('Age').value
+            };
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const result = data.prediction === 1 ? 'Paciente com Diabetes' : 'Paciente sem Diabetes';
+                const probability = (data.probability).toFixed(2); 
+                document.getElementById('result').innerHTML = `Resultado: ${result}<br>Probabilidade: ${probability}%`;
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Previsão de Diabetes</h1>
+
+        <form onsubmit="event.preventDefault(); sendData();">
+            <label for="Pregnancies">Número de Gravidezes:</label>
+            <small>Informe o número de gravidezes que a paciente teve.</small>
+            <input type="number" id="Pregnancies" required>
+
+            <label for="Glucose">Nível de Glicose:</label>
+            <small>Informe o nível de glicose da paciente em mg/dL.</small>
+            <input type="number" id="Glucose" required>
+
+            <label for="BloodPressure">Pressão Arterial:</label>
+            <small>Informe a pressão arterial da paciente em mmHg.</small>
+            <input type="number" id="BloodPressure" required>
+
+            <label for="SkinThickness">Espessura da Pele:</label>
+            <small>Informe a espessura da pele da paciente em mm.</small>
+            <input type="number" id="SkinThickness" required>
+
+            <label for="Insulin">Nível de Insulina:</label>
+            <small>Informe o nível de insulina da paciente em µU/mL.</small>
+            <input type="number" id="Insulin" required>
+
+            <label for="BMI">Índice de Massa Corporal (IMC):</label>
+            <small>Informe o Índice de Massa Corporal (IMC) da paciente.</small>
+            <input type="number" step="any" id="BMI" required>
+
+            <label for="DiabetesPedigreeFunction">Função do Pedigree de Diabetes:</label>
+            <small>Informe a função do pedigree de diabetes (valores entre 0 e 2.42).</small>
+            <input type="number" step="any" id="DiabetesPedigreeFunction" required>
+
+            <label for="Age">Idade:</label>
+            <small>Informe a idade da paciente em anos.</small>
+            <input type="number" id="Age" required>
+
+            <button type="submit">Prever</button>
+        </form>
+
+        <div id="result"></div>
+    </div>
+</body>
+</html>
